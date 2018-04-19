@@ -25,11 +25,16 @@ EpsilonGreedy <- function(n.trial, n.rep, epsilon){
   return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
 }
 
-SampleTrain <- function() {
-  case1 <- EpsilonGreedy(1000,2000,0.0)
-  case2 <- EpsilonGreedy(1000,2000,0.01)
-  case3 <- EpsilonGreedy(1000,2000,0.1)
-  return(c(case1 = case1, case2 = case2, case3 = case3))
+SampleTrainWithEpsilonGreedy <- function(args.matrix) {
+  dim.matrix <- dim(args.matrix)
+  for (i in 1:dim[1]) {
+    EpsilonGreedy(arg.matrix[i, 1], args.matrix[i, 2], args.matrix[i, 3])
+  }
+
+  #case1 <- EpsilonGreedy(1000, 2000, 0.0)
+  #case2 <- EpsilonGreedy(1000, 2000, 0.01)
+  #case3 <- EpsilonGreedy(1000, 2000, 0.1)
+  #return(c(case1 = case1, case2 = case2, case3 = case3))
 }
 
 PlotEpsilonGreedyResult <- function(results) {
@@ -45,7 +50,7 @@ PlotEpsilonGreedyResult <- function(results) {
 }
 
 Run <- function() {
-  PlotEpsilonGreedyResult(SampleTrain())
+  PlotEpsilonGreedyResult(SampleTrainWithEpsilonGreedy())
 }
 
 #SoftMax#
@@ -73,10 +78,16 @@ Softmax <- function(n.trial, n.rep, temperature) {
   return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
 }
 
-type1 <- Softmax(1000, 2000, 1)
-par(mfrow = c(2, 1))
-plot(type1$return, type = 'l', xlab = "play", ylab = "average reward")
-plot(type1$optimized, type = 'l', xlab = "play", ylab = "% optimal action")
+SampleTrainForSoftMax <- function() {
+  case1 <- Softmax(1000, 2000, 1)
+  return(c(case1 = case1))
+}
+
+PlotSoftmaxResult <- function(results) {
+  par(mfrow = c(2, 1))
+  plot(results$case1.return, type = 'l', xlab = "play", ylab = "average reward")
+  plot(results$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action")
+}
 
 #epsilon greedy optimistic#
 
@@ -106,11 +117,18 @@ epGreedyOpt <- function(n.trial, n.rep, epsilon, optimistic) {
   }
   return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
 }
-type1 <- epGreedyOpt(1000,2000,0,5)
-type2 <- epGreedyOpt(1000,2000,0.1,0)
-plot(type1$optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = 'red', ylim = c(0, 1.05))
-lines(type2$optimized, type='l', xlab = "play", ylab = "% optimal action", col = 'blue', ylim = c(0, 1.05))
-legend("bottomright", c("Q=5,epsilon=0", "Q=0,epsilon=0.1"), col = c("red", "blue"), lty = c(1, 1))
+
+SampleTrainWithGreedyOptimistic <- function() {
+  case1 <- epGreedyOpt(1000, 2000, 0, 5)
+  case2 <- epGreedyOpt(1000, 2000, 0.1, 0)
+  return(c(case1 = case1, case2 = case2))
+}
+
+PlotGreedyOptimisticResult <- function(results) {
+  plot(results$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = 'red', ylim = c(0, 1.05))
+  lines(results$case2.optimized, type='l', xlab = "play", ylab = "% optimal action", col = 'blue', ylim = c(0, 1.05))
+  legend("bottomright", c("Q=5,epsilon=0", "Q=0,epsilon=0.1"), col = c("red", "blue"), lty = c(1, 1))
+}
 
 ##reinforce comparison##
 
@@ -139,9 +157,15 @@ ReinComp <- function(n.trial, n.rep, optimistic) {
   }
   return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
 }
-type1 <- ReinComp(1000, 2000, 5)
-plot(type1$optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = "black", ylim = c(0, 1.05))
 
+SampleTrainWithRainComp <- function() {
+  case1 <- ReinComp(1000, 2000, 5)
+  return(c(case1 = case1))
+}
+
+PlotRainCompResult <- function(results) {
+  plot(results$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = "black", ylim = c(0, 1.05))
+}
 
 ##pursuit methods##
 
@@ -172,7 +196,13 @@ PursuitMethod <- function(n.trial, n.rep, optimistic) {
   }
   return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
 }
-type1 <- PursuitMethod(1000, 2000, 0)
-plot(type1$optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = "black", ylim = c(0, 1.05))
 
+SampleTrainWithPursuitMethod <- function() {
+  case1 <- PursuitMethod(1000, 2000, 0)
+  return(c(case1 = case1))
+}
+
+PlotPursuitMethodResult(results) {
+  plot(result$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = "black", ylim = c(0, 1.05))
+}
 
