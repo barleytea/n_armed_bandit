@@ -1,6 +1,13 @@
-#epsilon greedy#
+library(tidyverse)
 
-EpsilonGreedy <- function(n.trial, n.rep, epsilon){
+EpsilonGreedy <- function(n.trial, n.rep, epsilon) {
+  # Args:
+  #   n.trial:
+  #   n.rep:
+  #   epsilon: double
+  #
+  # Returns:
+  #   simulation result including percentages of the optimal action and return taken in every trial, and epsilon.
   return.history <- matrix(0, nrow = n.trial, ncol = n.rep)
   optimized.history <- return.history
   for (i.rep in 1:n.rep) {
@@ -22,35 +29,32 @@ EpsilonGreedy <- function(n.trial, n.rep, epsilon){
       q.estimatedimated[action] <- q.cumulatedulated[action] / action.count[action]
     }
   }
-  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
+  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history), epsilon = epsilon))
 }
 
-SampleTrainWithEpsilonGreedy <- function(args.matrix) {
-  dim.matrix <- dim(args.matrix)
-  for (i in 1:dim[1]) {
-    EpsilonGreedy(arg.matrix[i, 1], args.matrix[i, 2], args.matrix[i, 3])
-  }
-
-  #case1 <- EpsilonGreedy(1000, 2000, 0.0)
-  #case2 <- EpsilonGreedy(1000, 2000, 0.01)
-  #case3 <- EpsilonGreedy(1000, 2000, 0.1)
-  #return(c(case1 = case1, case2 = case2, case3 = case3))
+EpsilonGreedyWithMultipleConditions <- function(args.matrix) {
+  n.row <- dim(args.matrix)[1]
+  return(map(1:n.row, ~EpsilonGreedy(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotEpsilonGreedyResult <- function(results) {
+  result.size <- length(results)
+  colors <- rainbow(result.size)
+  epsilons <- map_dbl(results, function(x) {
+    return(unique(x$epsilon))
+  })
+  legends <- paste0("epsilon=", epsilons)
   par(mfrow = c(2, 1))
-  plot(results$case3.return, type = 'l', xlab = "Play", ylab = "average reward")
-  lines(results$case2.return, type = 'l', col = 'red')
-  lines(results$case1.return, type = 'l',col = 'green')
-  legend("bottomright", c("epsilon=0.00", "epsilon=0.01", "epsilon=0.10"), col = c("black", "red", "green"), lty = c(1, 1, 1))
-  plot(results$case3.optimized, type = 'l', xlab = "Play", ylab = "% optimal action")
-  lines(results$case2.optimized, type = 'l', col = 'red')
-  lines(results$case1.optimized, type = 'l', col = 'green')
-  legend("bottomright", c("epsilon=0.00", "epsilon=0.01", "epsilon=0.10"), col = c("black","red","green"), lty = c(1, 1, 1))
-}
-
-Run <- function() {
-  PlotEpsilonGreedyResult(SampleTrainWithEpsilonGreedy())
+  plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
+  plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
 
 #SoftMax#
