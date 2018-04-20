@@ -215,6 +215,13 @@ PlotGreedyOptimisticResult <- function(results) {
 # reinforce comparison
 
 ReinComp <- function(n.trial, n.rep, optimistic) {
+  # Args:
+  #   n.trial: the number of trials
+  #   n.rep: the number of banded tasks in every trials
+  #   optimistic: (positive number) optimistic
+  #
+  # Returns:
+  #   simulation result including percentages of the optimal action and return taken in every trial, and optimistic.
   return.history <- matrix(0, nrow = n.trial, ncol = n.rep)
   optimized.history <- return.history
   alpha <- 0.1
@@ -252,7 +259,7 @@ RainCompWithMultipleConditions <- function(args.matrix) {
 
 PlotRainCompResult <- function(results) {
   # Args:
-  #   results: (list) return of GreedyOptimisticWithMultipleConditions
+  #   results: (list) return of RainCompWithMultipleConditions
   result.size <- length(results)
   colors <- rainbow(result.size)
   optimistics <- map_dbl(results, function(x) {
@@ -275,6 +282,13 @@ PlotRainCompResult <- function(results) {
 # pursuit methods
 
 PursuitMethod <- function(n.trial, n.rep, optimistic) {
+  # Args:
+  #   n.trial: the number of trials
+  #   n.rep: the number of banded tasks in every trials
+  #   optimistic: (positive number) optimistic
+  #
+  # Returns:
+  #   simulation result including percentages of the optimal action and return taken in every trial, and optimistic.
   return.history <- array(0, c(n.trial, n.rep, 10))
   optimized.history <- matrix(0, nrow = n.trial, ncol = n.rep)
   beta <- 0.01
