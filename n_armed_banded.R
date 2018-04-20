@@ -62,35 +62,49 @@ PlotEpsilonGreedyResult <- function(results) {
 Softmax <- function(n.trial, n.rep, temperature) {
   return.history <- matrix(0, nrow = n.trial, ncol = n.rep)
   optimized.history <- return.history
-    for (i.rep in 1:n.rep) {
-      q.true <- rnorm(10)
-      q.estimated <- rep(0,10)
-      q.cumulated <- rep(0,10)
-      action.count <- rep(0,10)
-      optimized.id <- which.max(q.true)
-      t <- temperature
-      for(i.trial in 1:n.trial) {
-        action <- sample(1:10, 1, prob = exp(q.estimated / t) / sum(exp(q.estimated / t)))
-        return.history[i.trial, i.rep] <- rnorm(1) + q.true[action]
-        optimized.history[i.trial,i.rep] <- action == optimized.id
-        action.count[action] <- action.count[action] + 1
-        q.cumulated[action] <- q.cumulated[action] + return.history[i.trial, i.rep]
-        q.estimated[action] <- q.cumulated[action] / action.count[action]
-        t <- max(0.001, 0.995 * t)
-      }
+  for (i.rep in 1:n.rep) {
+    q.true <- rnorm(10)
+    q.estimated <- rep(0,10)
+    q.cumulated <- rep(0,10)
+    action.count <- rep(0,10)
+    optimized.id <- which.max(q.true)
+    t <- temperature
+    for(i.trial in 1:n.trial) {
+      action <- sample(1:10, 1, prob = exp(q.estimated / t) / sum(exp(q.estimated / t)))
+      return.history[i.trial, i.rep] <- rnorm(1) + q.true[action]
+      optimized.history[i.trial,i.rep] <- action == optimized.id
+      action.count[action] <- action.count[action] + 1
+      q.cumulated[action] <- q.cumulated[action] + return.history[i.trial, i.rep]
+      q.estimated[action] <- q.cumulated[action] / action.count[action]
+      t <- max(0.001, 0.995 * t)
     }
-  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
+  }
+  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history), temperature = temperature))
 }
 
-SampleTrainForSoftMax <- function() {
-  case1 <- Softmax(1000, 2000, 1)
-  return(c(case1 = case1))
+SoftMaxWithMultipleConditions <- function(args.matrix) {
+  n.row <- dim(args.matrix)[1]
+  return(map(1:n.row, Softmax(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotSoftmaxResult <- function(results) {
+  result.size <- length(results)
+  colors <- rainbow(result.size)
+  temperatureas <- map_dbl(results, function(x) {
+    return(unique(x$temperature))
+  })
+  legends <- paste0("temperature=", temperatures)
   par(mfrow = c(2, 1))
-  plot(results$case1.return, type = 'l', xlab = "play", ylab = "average reward")
-  plot(results$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action")
+  plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
+  plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
 
 #epsilon greedy optimistic#
