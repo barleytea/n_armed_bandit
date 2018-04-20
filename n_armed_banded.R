@@ -2,9 +2,9 @@ library(tidyverse)
 
 EpsilonGreedy <- function(n.trial, n.rep, epsilon) {
   # Args:
-  #   n.trial:
-  #   n.rep:
-  #   epsilon: double
+  #   n.trial: the number of trials
+  #   n.rep: the number of banded tasks in every trials
+  #   epsilon: (positive double) probability of taking random action
   #
   # Returns:
   #   simulation result including percentages of the optimal action and return taken in every trial, and epsilon.
@@ -33,11 +33,21 @@ EpsilonGreedy <- function(n.trial, n.rep, epsilon) {
 }
 
 EpsilonGreedyWithMultipleConditions <- function(args.matrix) {
+  # Args:
+  #   args.matrix: (matrix)
+  #     column1: (positive integer) n.trials
+  #     column2: (positive integer) n.rep
+  #     column3: (positive double) epsiron
+  #
+  # Returns:
+  #   list of Epsilon Greedy results
   n.row <- dim(args.matrix)[1]
   return(map(1:n.row, ~EpsilonGreedy(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotEpsilonGreedyResult <- function(results) {
+  # Args:
+  #   results: (list) return of EpsilonGreedyWithMultipleConditions
   result.size <- length(results)
   colors <- rainbow(result.size)
   epsilons <- map_dbl(results, function(x) {
@@ -57,9 +67,17 @@ PlotEpsilonGreedyResult <- function(results) {
   legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
 
-#SoftMax#
+# SoftMax
 
 Softmax <- function(n.trial, n.rep, temperature) {
+  # Args:
+  #   n.trial: the number of trials
+  #   n.rep: the number of banded tasks in every trials
+  #   epsilon: (positive double) temperature
+  #            high temperature enables agents to take random actions.
+  #
+  # Returns:
+  #   simulation result including percentages of the optimal action and return taken in every trial, and temperature.
   return.history <- matrix(0, nrow = n.trial, ncol = n.rep)
   optimized.history <- return.history
   for (i.rep in 1:n.rep) {
@@ -83,14 +101,24 @@ Softmax <- function(n.trial, n.rep, temperature) {
 }
 
 SoftMaxWithMultipleConditions <- function(args.matrix) {
+  # Args:
+  #   args.matrix: (matrix)
+  #     column1: (integer) n.trials
+  #     column2: (integer) n.rep
+  #     column3: (positive double) temperature
+  #
+  # Returns:
+  #   list of Softmax results
   n.row <- dim(args.matrix)[1]
   return(map(1:n.row, Softmax(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotSoftmaxResult <- function(results) {
+  # Args:
+  #   results: (list) return of SoftMaxWithMultipleConditions
   result.size <- length(results)
   colors <- rainbow(result.size)
-  temperatureas <- map_dbl(results, function(x) {
+  temperatures <- map_dbl(results, function(x) {
     return(unique(x$temperature))
   })
   legends <- paste0("temperature=", temperatures)
@@ -107,9 +135,18 @@ PlotSoftmaxResult <- function(results) {
   legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
 
-#epsilon greedy optimistic#
+# epsilon greedy optimistic#
 
-epGreedyOpt <- function(n.trial, n.rep, epsilon, optimistic) {
+EpsilonGreedyOptimistic <- function(n.trial, n.rep, epsilon, optimistic) {
+  # Args:
+  #   n.trial: the number of trials
+  #   n.rep: the number of banded tasks in every trials
+  #   epsilon: (positive double) temperature
+  #            high temperature enables agents to take random actions.
+  #   optimistic: (positive number) optimistic
+  #
+  # Returns:
+  #   simulation result including percentages of the optimal action and return taken in every trial, epsilon and optimistic.
   return.history <- array(0, c(n.trial, n.rep, 10));
   optimized.history <- matrix(0, nrow = n.trial, ncol = n.rep)
   alpha <- 0.1
@@ -133,25 +170,49 @@ epGreedyOpt <- function(n.trial, n.rep, epsilon, optimistic) {
       q.estimated[action] <- ((1 - alpha)^action.count[action]) * optimistic + sum(ret.weight)
     }
   }
-  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
+  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history), epsilon = epsilon, optimistic = optimistic))
 }
 
-SampleTrainWithGreedyOptimistic <- function() {
-  case1 <- epGreedyOpt(1000, 2000, 0, 5)
-  case2 <- epGreedyOpt(1000, 2000, 0.1, 0)
-  return(c(case1 = case1, case2 = case2))
+GreedyOptimisticWithMultipleConditions <- function(args.matrix) {
+  # Args:
+  #   args.matrix: (matrix)
+  #     column1: (integer) n.trials
+  #     column2: (integer) n.rep
+  #     column3: (positive double) epsilon
+  #     column4: (positive number) optimistic
+  #
+  # Returns:
+  #   list of Epsilon Greedy Optimistic results
+  n.row <- dim(args.matrix)[1]
+  return(map(1:n.row, EpsilonGreedyOptimistic(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3], args.matrix[.x, 4])))
 }
 
 PlotGreedyOptimisticResult <- function(results) {
-  plot(results$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = 'red', ylim = c(0, 1.05))
-  lines(results$case2.optimized, type='l', xlab = "play", ylab = "% optimal action", col = 'blue', ylim = c(0, 1.05))
-  legend("bottomright", c("Q=5,epsilon=0", "Q=0,epsilon=0.1"), col = c("red", "blue"), lty = c(1, 1))
+  # Args:
+  #   results: (list) return of GreedyOptimisticWithMultipleConditions
+  result.size <- length(results)
+  colors <- rainbow(result.size)
+  epsilons <- map_dbl(results, function(x) {
+    return(unique(x$temperature))
+  })
+  optimistics <- map_dbl(results, function(x) {
+    return(unique(x$optimistic))
+  })
+  legends <- paste0("epsilon=", epsilons, ", optimistic=", optimistics)
+  par(mfrow = c(2, 1))
+  plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
+  plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
 
-##reinforce comparison##
-
-#p_t+1(a_t)=p_t(a_t)+beta*(r_t-r.bar_t)
-#r.bar_t+1=r.bar_t+alpha*(r_t-r.bar_t)
+# reinforce comparison
 
 ReinComp <- function(n.trial, n.rep, optimistic) {
   return.history <- matrix(0, nrow = n.trial, ncol = n.rep)
@@ -173,19 +234,45 @@ ReinComp <- function(n.trial, n.rep, optimistic) {
       ret.ref <- ret.ref + alpha * (return.history[i.trial, i.rep] - ret.ref)
     }
   }
-  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
+  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history), optimistic = optimistic))
 }
 
-SampleTrainWithRainComp <- function() {
-  case1 <- ReinComp(1000, 2000, 5)
-  return(c(case1 = case1))
+RainCompWithMultipleConditions <- function(args.matrix) {
+  # Args:
+  #   args.matrix: (matrix)
+  #     column1: (integer) n.trials
+  #     column2: (integer) n.rep
+  #     column3: (positive number) optimistic
+  #
+  # Returns:
+  #   list of ReinforcementComparison results
+  n.row <- dim(args.matrix)[1]
+  return(map(1:n.row, RainComp(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotRainCompResult <- function(results) {
-  plot(results$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = "black", ylim = c(0, 1.05))
+  # Args:
+  #   results: (list) return of GreedyOptimisticWithMultipleConditions
+  result.size <- length(results)
+  colors <- rainbow(result.size)
+  optimistics <- map_dbl(results, function(x) {
+    return(unique(x$optimistic))
+  })
+  legends <- paste0("optimistic=", optimistics)
+  par(mfrow = c(2, 1))
+  plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
+  plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
 
-##pursuit methods##
+# pursuit methods
 
 PursuitMethod <- function(n.trial, n.rep, optimistic) {
   return.history <- array(0, c(n.trial, n.rep, 10))
@@ -212,15 +299,41 @@ PursuitMethod <- function(n.trial, n.rep, optimistic) {
       pie[-maxQ] <- pie[-maxQ] + beta * (0 - pie[-maxQ])
     }
   }
-  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history)))
+  return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history), optimistic = optimistic))
 }
 
-SampleTrainWithPursuitMethod <- function() {
-  case1 <- PursuitMethod(1000, 2000, 0)
-  return(c(case1 = case1))
+PursuitMethodWithMultipleConditions <- function(args.matrix) {
+  # Args:
+  #   args.matrix: (matrix)
+  #     column1: (integer) n.trials
+  #     column2: (integer) n.rep
+  #     column3: (positive number) optimistic
+  #
+  # Returns:
+  #   list of Pursuit Method results
+  n.row <- dim(args.matrix)[1]
+  return(map(1:n.row, PursuitMethod(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotPursuitMethodResult(results) {
-  plot(result$case1.optimized, type = 'l', xlab = "play", ylab = "% optimal action", col = "black", ylim = c(0, 1.05))
+  # Args:
+  #   results: (list) return of PursuitMethodWithMultipleConditions
+  result.size <- length(results)
+  colors <- rainbow(result.size)
+  optimistics <- map_dbl(results, function(x) {
+    return(unique(x$optimistic))
+  })
+  legends <- paste0("optimistic=", optimistics)
+  par(mfrow = c(2, 1))
+  plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
+  plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action")
+  for (i.result in 2:result.size) {
+    lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
+  }
+  legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
 
