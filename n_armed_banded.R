@@ -329,7 +329,7 @@ PursuitMethodWithMultipleConditions <- function(args.matrix) {
   return(map(1:n.row, PursuitMethod(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
-PlotPursuitMethodResult(results) {
+PlotPursuitMethodResult <- function(results) {
   # Args:
   #   results: (list) return of PursuitMethodWithMultipleConditions
   result.size <- length(results)
