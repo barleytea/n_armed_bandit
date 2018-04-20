@@ -12,21 +12,21 @@ EpsilonGreedy <- function(n.trial, n.rep, epsilon) {
   optimized.history <- return.history
   for (i.rep in 1:n.rep) {
     q.true <- rnorm(10)
-    q.estimatedimated <- rep(0, 10)
-    q.cumulatedulated <- rep(0, 10)
+    q.estimated <- rep(0, 10)
+    q.cumulated <- rep(0, 10)
     action.count <-  rep(0, 10)
     optimized.id <- which.max(q.true)
     for (i.trial in 1:n.trial) {
       if (runif(1) < epsilon) {
         action <- sample(1:10, 1)
       } else {
-        action <- which.max(q.estimatedimated)
+        action <- which.max(q.estimated)
       }
       return.history[i.trial, i.rep] <- rnorm(1) + q.true[action]
       optimized.history[i.trial, i.rep] <- action == optimized.id
       action.count[action] <- action.count[action] + 1
-      q.cumulatedulated[action] <- q.cumulatedulated[action] + return.history[i.trial, i.rep]
-      q.estimatedimated[action] <- q.cumulatedulated[action] / action.count[action]
+      q.cumulated[action] <- q.cumulated[action] + return.history[i.trial, i.rep]
+      q.estimated[action] <- q.cumulated[action] / action.count[action]
     }
   }
   return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history), epsilon = epsilon))
