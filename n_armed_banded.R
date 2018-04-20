@@ -110,7 +110,7 @@ SoftMaxWithMultipleConditions <- function(args.matrix) {
   # Returns:
   #   list of Softmax results
   n.row <- dim(args.matrix)[1]
-  return(map(1:n.row, Softmax(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
+  return(map(1:n.row, ~Softmax(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotSoftmaxResult <- function(results) {
@@ -184,7 +184,7 @@ GreedyOptimisticWithMultipleConditions <- function(args.matrix) {
   # Returns:
   #   list of Epsilon Greedy Optimistic results
   n.row <- dim(args.matrix)[1]
-  return(map(1:n.row, EpsilonGreedyOptimistic(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3], args.matrix[.x, 4])))
+  return(map(1:n.row, ~EpsilonGreedyOptimistic(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3], args.matrix[.x, 4])))
 }
 
 PlotGreedyOptimisticResult <- function(results) {
@@ -254,7 +254,7 @@ RainCompWithMultipleConditions <- function(args.matrix) {
   # Returns:
   #   list of ReinforcementComparison results
   n.row <- dim(args.matrix)[1]
-  return(map(1:n.row, RainComp(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
+  return(map(1:n.row, ~RainComp(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotRainCompResult <- function(results) {
@@ -326,7 +326,7 @@ PursuitMethodWithMultipleConditions <- function(args.matrix) {
   # Returns:
   #   list of Pursuit Method results
   n.row <- dim(args.matrix)[1]
-  return(map(1:n.row, PursuitMethod(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
+  return(map(1:n.row, ~PursuitMethod(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
 }
 
 PlotPursuitMethodResult <- function(results) {
