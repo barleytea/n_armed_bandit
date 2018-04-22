@@ -32,17 +32,16 @@ EpsilonGreedy <- function(n.trial, n.rep, epsilon) {
   return(data.frame(optimized = rowMeans(optimized.history), return = rowMeans(return.history), epsilon = epsilon))
 }
 
-EpsilonGreedyWithMultipleConditions <- function(args.matrix) {
+TrainEpsilonGreedy <- function(n.trial, n.rep, epsilons) {
   # Args:
   #   args.matrix: (matrix)
-  #     column1: (positive integer) n.trials
-  #     column2: (positive integer) n.rep
-  #     column3: (positive double) epsiron
+  #     n.trial: (positive integer) n.trials
+  #     n.rep: (positive integer) n.rep
+  #     epsilons: (list of positive double) epsilons
   #
   # Returns:
   #   list of Epsilon Greedy results
-  n.row <- dim(args.matrix)[1]
-  return(map(1:n.row, ~EpsilonGreedy(args.matrix[.x, 1], args.matrix[.x, 2], args.matrix[.x, 3])))
+  return(map(epsilons, ~EpsilonGreedy(n.trial, n.rep, .x)))
 }
 
 PlotEpsilonGreedyResult <- function(results) {
@@ -56,13 +55,17 @@ PlotEpsilonGreedyResult <- function(results) {
   legends <- paste0("epsilon=", epsilons)
   par(mfrow = c(2, 1))
   plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward")
-  for (i.result in 2:result.size) {
-    lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
+  if (result.size > 1) {
+    for (i.result in 2:result.size) {
+      lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
+    }
   }
   legend("bottomright", legends, col = colors, lty = rep(1, result.size))
   plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action")
-  for (i.result in 2:result.size) {
-    lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
+  if (result.size > 1) {
+    for (i.result in 2:result.size) {
+      lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
+    }
   }
   legend("bottomright", legends, col = colors, lty = rep(1, result.size))
 }
