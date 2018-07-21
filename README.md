@@ -1,2 +1,2 @@
-# n_armed_banded
-struggling to solve n-armed banded problem with some naive reinforcement learning methods.
+# n_armed_bandit
+struggling to solve n-armed bandit problem with some naive reinforcement learning methods.

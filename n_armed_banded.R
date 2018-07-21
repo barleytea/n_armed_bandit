@@ -54,14 +54,14 @@ PlotEpsilonGreedyResult <- function(results) {
   })
   legends <- paste0("epsilon=", epsilons)
   par(mfrow = c(2, 1))
-  plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward")
+  plot(results[[1]]$return, type = 'l', col = colors[1], xlab = "Play", ylab = "average reward", ylim = c(0, 2))
   if (result.size > 1) {
     for (i.result in 2:result.size) {
       lines(results[[i.result]]$return, type = 'l', col = colors[i.result])
     }
   }
   legend("bottomright", legends, col = colors, lty = rep(1, result.size))
-  plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action")
+  plot(results[[1]]$optimized, type = 'l', col = colors[1], xlab = "Play", ylab = "% optimal action", ylim = c(0, 1))
   if (result.size > 1) {
     for (i.result in 2:result.size) {
       lines(results[[i.result]]$optimized, type = 'l', col = colors[i.result])
