@@ -46,7 +46,7 @@ TrainEpsilonGreedy <- function(n.trial, n.rep, epsilons) {
 
 PlotEpsilonGreedyResult <- function(results) {
   # Args:
-  #   results: (list) return of EpsilonGreedyWithMultipleConditions
+  #   results: (list) return of TrainEpsilonGreedy
   result.size <- length(results)
   colors <- rainbow(result.size)
   epsilons <- map_dbl(results, function(x) {
